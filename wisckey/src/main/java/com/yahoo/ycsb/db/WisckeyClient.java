@@ -17,11 +17,11 @@
 
 package com.yahoo.ycsb.db;
 
-import com.yahoo.ycsb.ByteArrayByteIterator;
-import com.yahoo.ycsb.ByteIterator;
-import com.yahoo.ycsb.DB;
-import com.yahoo.ycsb.DBException;
-import com.yahoo.ycsb.Status;
+import site.ycsb.ByteArrayByteIterator;
+import site.ycsb.ByteIterator;
+import site.ycsb.DB;
+import site.ycsb.DBException;
+import site.ycsb.Status;
 
 import java.io.*;
 import java.io.IOException;
@@ -34,7 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -45,7 +46,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class WisckeyClient extends DB {
   static final String PROPERTY_SCAN_VALUE = "scan.value";
   static final String PROPERTY_SCAN_DIST = "scan.dist";
-  private Logger logger = Logger.getLogger(getClass());
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
    * The WisckeyClient implementation that will be used to communicate
@@ -89,7 +90,9 @@ public class WisckeyClient extends DB {
       rdopts.init(null, 0);
       
       byte[] value = client.get(rdopts, key.getBytes(UTF_8), key.length());
-      if (value == null) return Status.NOT_FOUND;
+      if (value == null) {
+        return Status.NOT_FOUND;
+      }
       deserializeValues(value, fields, result);
       return Status.OK;
     } catch (Exception e) {
@@ -196,8 +199,8 @@ public class WisckeyClient extends DB {
     return MessageFormat.format("{0}-{1}", table, key);
   }
 
-  protected Map<String, ByteIterator> deserializeValues(byte[] values, Set<String> fields, 
-  Map<String, ByteIterator> result) {
+  protected Map<String, ByteIterator> deserializeValues(byte[] values, Set<String> fields,
+                                                        Map<String, ByteIterator> result) {
     ByteBuffer buf = ByteBuffer.allocate(4);
 
     int offset = 0;
