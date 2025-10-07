@@ -264,6 +264,12 @@ LICENSE file.
       <artifactId>zookeeper-binding</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- experimental -->
+    <dependency>
+      <groupId>site.ycsb</groupId>
+      <artifactId>wisckey-binding</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
   </dependencies>
   <build>
