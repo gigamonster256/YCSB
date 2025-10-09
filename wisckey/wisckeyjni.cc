@@ -23,6 +23,8 @@ wisckey::WriteOptions wropts;
 
 JNIEXPORT jboolean JNICALL Java_site_ycsb_db_wisckey_Wisckey_init(JNIEnv *env, jobject thisobj)
 {
+    (void)env;
+    (void)thisobj;
     std::ifstream ifs("wisckey_config.json");
     std::string file_content((std::istreambuf_iterator<char>(ifs)),
                              (std::istreambuf_iterator<char>()));
@@ -56,6 +58,7 @@ JNIEXPORT jboolean JNICALL Java_site_ycsb_db_wisckey_Wisckey_init(JNIEnv *env, j
 
 JNIEXPORT jboolean JNICALL Java_site_ycsb_db_wisckey_Wisckey_close(JNIEnv *env, jobject)
 {
+    (void)env;
     delete db;
     return true;
 }
@@ -81,14 +84,16 @@ JNIEXPORT jbyteArray JNICALL Java_site_ycsb_db_wisckey_Wisckey_get(JNIEnv *env, 
     jfieldID fidcppPtr = env->GetFieldID(readoptionsClass, "cppPtr", "J");
     ;
     jlong cpp_ptr = env->GetLongField(readoptionsObject, fidcppPtr);
-    const wisckey::ReadOptions *rdopts = *(wisckey::ReadOptions **)&cpp_ptr;
+    wisckey::ReadOptions *rdopts;
+    memcpy(&rdopts, &cpp_ptr, sizeof(rdopts));
+    const wisckey::ReadOptions *rdopts_const = rdopts;
 
     jbyte *key = new jbyte[jkey_len];
     env->GetByteArrayRegion(jkey, 0, jkey_len, key);
 
     wisckey::Slice kv_key((const char *)key, jkey_len);
     std::string kv_val;
-    wisckey::Status get_ret = db->Get(*rdopts, kv_key, &kv_val);
+    wisckey::Status get_ret = db->Get(*rdopts_const, kv_key, &kv_val);
     if (get_ret.IsNotFound())
         return nullptr;
 
@@ -177,11 +182,14 @@ static wisckey::Iterator *_IT_get_cpp_ptr(JNIEnv *env, jobject thisObj)
     jfieldID fidcppPtr = env->GetFieldID(thisClass, "cppPtr", "J");
     ;
     jlong cpp_ptr = env->GetLongField(thisObj, fidcppPtr);
-    return *(Iterator **)&cpp_ptr;
+    wisckey::Iterator *result;
+    memcpy(&result, &cpp_ptr, sizeof(result));
+    return result;
 }
 static void _IT_set_java_ptr(JNIEnv *env, jobject thisObj, wisckey::Iterator *self)
 {
-    jlong ptr = *(jlong *)&self;
+    jlong ptr;
+    memcpy(&ptr, &self, sizeof(ptr));
     jclass thisClass = env->GetObjectClass(thisObj);
     jfieldID fidcppPtr = env->GetFieldID(thisClass, "cppPtr", "J");
     ;
@@ -195,7 +203,8 @@ JNIEXPORT void JNICALL Java_site_ycsb_db_wisckey_Iterator_init(JNIEnv *env, jobj
     jfieldID fidcppPtr = env->GetFieldID(readoptionsClass, "cppPtr", "J");
     ;
     jlong cpp_ptr = env->GetLongField(readoptionsObject, fidcppPtr);
-    const wisckey::ReadOptions *rdopts = *(wisckey::ReadOptions **)&cpp_ptr;
+    wisckey::ReadOptions *rdopts;
+    memcpy(&rdopts, &cpp_ptr, sizeof(rdopts));
     wisckey::Iterator *self = db->NewIterator(*rdopts);
     _IT_set_java_ptr(env, thisobj, self);
 }
@@ -271,11 +280,14 @@ static wisckey::ReadOptions *_RO_get_cpp_ptr(JNIEnv *env, jobject thisObj)
     jfieldID fidcppPtr = env->GetFieldID(thisClass, "cppPtr", "J");
     ;
     jlong cpp_ptr = env->GetLongField(thisObj, fidcppPtr);
-    return *(ReadOptions **)&cpp_ptr;
+    wisckey::ReadOptions *result;
+    memcpy(&result, &cpp_ptr, sizeof(result));
+    return result;
 }
 static void _RO_set_java_ptr(JNIEnv *env, jobject thisObj, wisckey::ReadOptions *self)
 {
-    jlong ptr = *(jlong *)&self;
+    jlong ptr;
+    memcpy(&ptr, &self, sizeof(ptr));
     jclass thisClass = env->GetObjectClass(thisObj);
     jfieldID fidcppPtr = env->GetFieldID(thisClass, "cppPtr", "J");
     ;
