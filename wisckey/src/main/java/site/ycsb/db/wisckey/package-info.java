@@ -18,4 +18,4 @@
 /**
  * YCSB binding for Wisckey.
  */
-package com.yahoo.ycsb.db;
+package site.ycsb.db.wisckey;

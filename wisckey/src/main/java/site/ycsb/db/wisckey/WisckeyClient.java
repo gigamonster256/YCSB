@@ -15,7 +15,7 @@
  * LICENSE file.
  */
 
-package com.yahoo.ycsb.db;
+package site.ycsb.db.wisckey;
 
 import site.ycsb.ByteArrayByteIterator;
 import site.ycsb.ByteIterator;
