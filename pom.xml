@@ -208,6 +208,7 @@ LICENSE file.
     <module>zookeeper</module>
     <!-- experimental -->
 		<module>wisckey</module>
+    <module>snapdb</module>
   </modules>
 
   <build>

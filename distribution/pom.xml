@@ -270,6 +270,11 @@ LICENSE file.
       <artifactId>wisckey-binding</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>site.ycsb</groupId>
+      <artifactId>snapdb-binding</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
   </dependencies>
   <build>

@@ -3,24 +3,24 @@
 trap "exit" INT
 
 # record_counts="1M 10M 50M 100M"
-record_counts="50M"
+record_counts="1M"
 # load_sizes="64 256 1k 4k"
 load_sizes="64"
 # 512 1k"
 # 512 1k 4k"
 # scan_lengths="100"
 # scan_lengths="50 100 500"
-scan_lengths=""
-aging_rounds=0
+scan_lengths="50 100"
+aging_rounds=3
 do_compaction=0
-do_gets=0
-do_get_update=0
+do_gets=1
+do_get_update=1
 aging_last=0
 
-results_dir="results/intial_50M"
+results_dir="results/intial_1M"
 # dbs="snap3db"
 # dbs="mixdb rocksdb wisckey snap3db"
-dbs="rocksdb wisckey"
+dbs="snapdb"
 # snapdb wisckey rocksdb snap3db mixdb"
 
 if [ ! -d "$results_dir" ]; then
