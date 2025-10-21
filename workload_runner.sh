@@ -10,14 +10,15 @@ load_sizes="64"
 # 512 1k 4k"
 # scan_lengths="100"
 # scan_lengths="50 100 500"
-scan_lengths="50 100"
-aging_rounds=3
+scan_lengths=""
+aging_rounds=0
 do_compaction=0
 do_gets=1
 do_get_update=1
 aging_last=0
 
-results_dir="results/intial_1M"
+
+results_dir="results/throughput_start_stop_1M"
 # dbs="snap3db"
 # dbs="mixdb rocksdb wisckey snap3db"
 dbs="snapdb"
