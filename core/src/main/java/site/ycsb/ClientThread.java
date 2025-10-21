@@ -44,6 +44,10 @@ public class ClientThread implements Runnable {
   private Properties props;
   private long targetOpsTickNs;
   private final Measurements measurements;
+  private CountDownLatch initLatch;
+  private CountDownLatch startGate;
+  private CountDownLatch operationsCompleteLatch;
+  private CountDownLatch cleanupPermissionLatch;
 
   /**
    * Constructor.
@@ -73,6 +77,15 @@ public class ClientThread implements Runnable {
     this.completeLatch = completeLatch;
   }
 
+  public void configureLifecycleLatches(CountDownLatch init, CountDownLatch start,
+                                        CountDownLatch operationsComplete,
+                                        CountDownLatch cleanupPermission) {
+    this.initLatch = init;
+    this.startGate = start;
+    this.operationsCompleteLatch = operationsComplete;
+    this.cleanupPermissionLatch = cleanupPermission;
+  }
+
   public void setThreadId(final int threadId) {
     threadid = threadId;
   }
@@ -87,22 +100,55 @@ public class ClientThread implements Runnable {
 
   @Override
   public void run() {
+    boolean initialized = false;
     try {
-      db.init();
-    } catch (DBException e) {
+      try {
+        db.init();
+        initialized = true;
+      } catch (DBException e) {
+        signalInitComplete();
+        e.printStackTrace();
+        e.printStackTrace(System.out);
+        return;
+      }
+
+      try {
+        workloadstate = workload.initThread(props, threadid, threadcount);
+      } catch (WorkloadException e) {
+        signalInitComplete();
+        e.printStackTrace();
+        e.printStackTrace(System.out);
+        return;
+      }
+
+      signalInitComplete();
+
+      awaitStartGate();
+
+      runOperationLoop();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } catch (Exception e) {
       e.printStackTrace();
       e.printStackTrace(System.out);
-      return;
+      System.exit(0);
+    } finally {
+      measurements.setIntendedStartTimeNs(0);
+      signalOperationsComplete();
+      awaitCleanupPermission();
+      if (initialized) {
+        try {
+          db.cleanup();
+        } catch (DBException e) {
+          e.printStackTrace();
+          e.printStackTrace(System.out);
+        }
+      }
+      completeLatch.countDown();
     }
+  }
 
-    try {
-      workloadstate = workload.initThread(props, threadid, threadcount);
-    } catch (WorkloadException e) {
-      e.printStackTrace();
-      e.printStackTrace(System.out);
-      return;
-    }
-
+  private void runOperationLoop() throws Exception {
     //NOTE: Switching to using nanoTime and parkNanos for time management here such that the measurements
     // and the client thread have the same view on time.
 
@@ -113,48 +159,61 @@ public class ClientThread implements Runnable {
       long randomMinorDelay = ThreadLocalRandom.current().nextInt((int) targetOpsTickNs);
       sleepUntil(System.nanoTime() + randomMinorDelay);
     }
-    try {
-      if (dotransactions) {
-        long startTimeNanos = System.nanoTime();
 
-        while (((opcount == 0) || (opsdone < opcount)) && !workload.isStopRequested()) {
+    if (dotransactions) {
+      long startTimeNanos = System.nanoTime();
 
-          if (!workload.doTransaction(db, workloadstate)) {
-            break;
-          }
+      while (((opcount == 0) || (opsdone < opcount)) && !workload.isStopRequested()) {
 
-          opsdone++;
-
-          throttleNanos(startTimeNanos);
+        if (!workload.doTransaction(db, workloadstate)) {
+          break;
         }
-      } else {
-        long startTimeNanos = System.nanoTime();
 
-        while (((opcount == 0) || (opsdone < opcount)) && !workload.isStopRequested()) {
+        opsdone++;
 
-          if (!workload.doInsert(db, workloadstate)) {
-            break;
-          }
-
-          opsdone++;
-
-          throttleNanos(startTimeNanos);
-        }
+        throttleNanos(startTimeNanos);
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-      e.printStackTrace(System.out);
-      System.exit(0);
-    }
+    } else {
+      long startTimeNanos = System.nanoTime();
 
-    try {
-      measurements.setIntendedStartTimeNs(0);
-      db.cleanup();
-    } catch (DBException e) {
-      e.printStackTrace();
-      e.printStackTrace(System.out);
-    } finally {
-      completeLatch.countDown();
+      while (((opcount == 0) || (opsdone < opcount)) && !workload.isStopRequested()) {
+
+        if (!workload.doInsert(db, workloadstate)) {
+          break;
+        }
+
+        opsdone++;
+
+        throttleNanos(startTimeNanos);
+      }
+    }
+  }
+
+  private void signalInitComplete() {
+    if (initLatch != null) {
+      initLatch.countDown();
+    }
+  }
+
+  private void signalOperationsComplete() {
+    if (operationsCompleteLatch != null) {
+      operationsCompleteLatch.countDown();
+    }
+  }
+
+  private void awaitCleanupPermission() {
+    if (cleanupPermissionLatch != null) {
+      try {
+        cleanupPermissionLatch.await();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+    }
+  }
+
+  private void awaitStartGate() throws InterruptedException {
+    if (startGate != null) {
+      startGate.await();
     }
   }
 

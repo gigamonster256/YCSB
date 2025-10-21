@@ -17,8 +17,7 @@ do_gets=1
 do_get_update=1
 aging_last=0
 
-
-results_dir="results/throughput_start_stop_1M"
+results_dir="results/throughput_no_start_stop_1M"
 # dbs="snap3db"
 # dbs="mixdb rocksdb wisckey snap3db"
 dbs="snapdb"

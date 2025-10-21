@@ -311,6 +311,17 @@ public final class Client {
     final List<ClientThread> clients = initDb(dbname, props, threadcount, targetperthreadperms,
         workload, tracer, completeLatch);
 
+    final int actualThreadCount = clients.size();
+    for (int i = actualThreadCount; i < threadcount; i++) {
+      completeLatch.countDown();
+    }
+    final CountDownLatch initLatch = new CountDownLatch(actualThreadCount);
+    final CountDownLatch startGate = new CountDownLatch(1);
+    final CountDownLatch operationsDoneLatch = new CountDownLatch(actualThreadCount);
+    final CountDownLatch cleanupPermissionLatch = new CountDownLatch(1);
+    for (ClientThread client : clients) {
+      client.configureLifecycleLatches(initLatch, startGate, operationsDoneLatch, cleanupPermissionLatch);
+    }
     if (status) {
       boolean standardstatus = false;
       if (props.getProperty(Measurements.MEASUREMENT_TYPE_PROPERTY, "").compareTo("timeseries") == 0) {
@@ -331,23 +342,36 @@ public final class Client {
 
     try (final TraceScope span = tracer.newScope(CLIENT_WORKLOAD_SPAN)) {
 
-      final Map<Thread, ClientThread> threads = new HashMap<>(threadcount);
+      final Map<Thread, ClientThread> threads = new HashMap<>(actualThreadCount);
       for (ClientThread client : clients) {
         threads.put(new Thread(tracer.wrap(client, "ClientThread")), client);
       }
-
-      st = System.currentTimeMillis();
-
       for (Thread t : threads.keySet()) {
         t.start();
       }
+      try {
+        initLatch.await();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      st = System.currentTimeMillis();
+      startGate.countDown();
 
-      if (maxExecutionTime > 0) {
+      if (maxExecutionTime > 0 && !threads.isEmpty()) {
         terminator = new TerminatorThread(maxExecutionTime, threads.keySet(), workload);
         terminator.start();
       }
 
       opsDone = 0;
+
+      try {
+        operationsDoneLatch.await();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+
+      en = System.currentTimeMillis();
+      cleanupPermissionLatch.countDown();
 
       for (Map.Entry<Thread, ClientThread> entry : threads.entrySet()) {
         try {
@@ -357,8 +381,6 @@ public final class Client {
           // ignored
         }
       }
-
-      en = System.currentTimeMillis();
     }
 
     try {
