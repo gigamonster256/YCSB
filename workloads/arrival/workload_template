@@ -28,7 +28,7 @@
 # https://github.com/brianfrankcooper/YCSB/wiki/Core-Properties
 
 # The name of the workload class to use
-workload=site.ycsb.workloads.CoreWorkload
+workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 # If a generalized pareto distribution should be used to determine
 # inter-arrival rate of requests to the database. (used by facebook workload)
@@ -88,21 +88,6 @@ scanproportion=0
 # On a single scan, the maximum number of records to access
 maxscanlength=1000
 
-# On a single scan, the max number of records to scan per second.
-# It's used for rate limiting. No effect if it's zero or larger
-# than the actual scan rate or scan range. Only used by
-# CloudBigtable2Client.
-maxscanrate=0
-
-# The time limit (in seconds) for a single scan operation.
-# No effect if zero. Only used by CloudBigtable2Client.
-scanoptimelimit=0
-
-# Should the scanned record be discarded or not. For large scans,
-# the client may hit out of memory error if keeping the data
-# in memory. Only used by CloudBigtable2Client.
-discardscannedrecord=false
-
 # The distribution used to choose the number of records to access on a scan
 scanlengthdistribution=uniform
 #scanlengthdistribution=zipfian
@@ -151,10 +136,6 @@ measurementtype=histogram
 # The output file will be appended to if it already exists, otherwise
 # a new output file will be created.
 #measurement.raw.output_file = /tmp/your_output_file_for_this_run
-
-# Whether or not to emit individual histogram buckets when measuring
-# using histograms.
-# measurement.histogram.verbose = false
 
 # JVM Reporting.
 #

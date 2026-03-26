@@ -186,6 +186,7 @@ LICENSE file.
     <module>infinispan</module>
     <module>jdbc</module>
     <module>kudu</module>
+    <module>leveldb</module>
     <module>maprdb</module>
     <module>maprjsondb</module>
     <module>memcached</module>
@@ -193,6 +194,7 @@ LICENSE file.
     <module>nosqldb</module>
     <module>orientdb</module>
     <module>postgrenosql</module>
+    <module>pebblesdb</module>
     <module>rados</module>
     <module>redis</module>
     <module>rest</module>

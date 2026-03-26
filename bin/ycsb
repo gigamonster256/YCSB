@@ -87,6 +87,7 @@ DATABASES = {
     "infinispan"   : "site.ycsb.db.InfinispanClient",
     "jdbc"         : "site.ycsb.db.JdbcDBClient",
     "kudu"         : "site.ycsb.db.KuduYCSBClient",
+    "leveldb"      : "site.ycsb.db.LevelDBClient",
     "memcached"    : "site.ycsb.db.MemcachedClient",
     "maprdb"       : "site.ycsb.db.mapr.MapRDBClient",
     "maprjsondb"   : "site.ycsb.db.mapr.MapRJSONDBClient",
@@ -109,7 +110,8 @@ DATABASES = {
     "zookeeper"    : "site.ycsb.db.zookeeper.ZKClient",
     # experimental
     "wisckey"     : "site.ycsb.db.wisckey.WisckeyClient",
-    "snapdb"     : "site.ycsb.db.snapdb.SnapDBClient"
+    "snapdb"     : "site.ycsb.db.snapdb.SnapDBClient",
+    "pebblesdb"     : "site.ycsb.db.PebblesDBClient",
 }
 
 OPTIONS = {

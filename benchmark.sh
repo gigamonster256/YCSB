@@ -5,6 +5,7 @@ trap "exit" INT
 # global variables
 workload_dir="workloads"
 rocksdb_dir="/mnt/kvs/scratch/rocksdb"
+pebblesdb_dir="/mnt/kvs/scratch/pebblesdb"
 
 # usage function
 function usage {
@@ -77,7 +78,7 @@ function load {
     # /mnt/kvs/scratch/clean.sh
     for db in $dbs; do
         # echo Executing load on $db with record size $record_size and record count $record_count
-        execute load $db $workload_file "-p rocksdb.dir=$rocksdb_dir" # -p rocksdb.optionsfile=/mnt/kvs/ycsb/YCSB-0.15.0/rocksdbconfig.ini" # rocksdb args are harmless to other dbs
+        execute load $db $workload_file "-p rocksdb.dir=$rocksdb_dir -p pebblesdb.path=$pebblesdb_dir" # -p rocksdb.optionsfile=/mnt/kvs/ycsb/YCSB-0.15.0/rocksdbconfig.ini" # rocksdb args are harmless to other dbs
         echo
     done
 }
@@ -92,7 +93,7 @@ function get {
 
     for db in $dbs; do
         # echo Executing get on $db with record count $record_count
-        execute run $db $workload_file "-p rocksdb.dir=$rocksdb_dir -p rocksdb.optionsfile=/mnt/kvs/ycsb/YCSB-0.15.0/rocksdbconfig.ini"
+        execute run $db $workload_file "-p rocksdb.dir=$rocksdb_dir -p pebblesdb.path=$pebblesdb_dir"
         echo
     done
 }
@@ -107,7 +108,7 @@ function get_update {
 
     for db in $dbs; do
         # echo Executing get_update on $db with record count $record_count
-        execute run $db $workload_file "-p rocksdb.dir=$rocksdb_dir -p rocksdb.optionsfile=/mnt/kvs/ycsb/YCSB-0.15.0/rocksdbconfig.ini"
+        execute run $db $workload_file "-p rocksdb.dir=$rocksdb_dir -p pebblesdb.path=$pebblesdb_dir"
         echo
     done
 }
@@ -136,7 +137,7 @@ function scan {
 
     for db in $dbs; do
         # echo Executing scan on $db with length $length and record count $record_count
-        execute run $db $workload_file "-p rocksdb.dir=$rocksdb_dir"
+        execute run $db $workload_file "-p rocksdb.dir=$rocksdb_dir -p pebblesdb.path=$pebblesdb_dir"
         echo
     done
 }
@@ -151,7 +152,7 @@ function aging {
 
     for db in $dbs; do
         # echo Executing aging on $db with record count $record_count
-        execute run $db $workload_file "-p rocksdb.dir=$rocksdb_dir"
+        execute run $db $workload_file "-p rocksdb.dir=$rocksdb_dir -p pebblesdb.path=$pebblesdb_dir"
         echo
     done
 }

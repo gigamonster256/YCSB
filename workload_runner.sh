@@ -3,7 +3,7 @@
 trap "exit" INT
 
 # record_counts="1M 10M 50M 100M"
-record_counts="50M"
+record_counts="1M"
 # load_sizes="64 256 1k 4k"
 load_sizes="64"
 # 512 1k"
@@ -17,11 +17,11 @@ do_gets=1
 do_get_update=0
 aging_last=0
 
-results_dir="results/snaptree_filter_fixed_large"
+results_dir="results/initial_pebblesdb"
 # dbs="snap3db"
 # dbs="mixdb rocksdb wisckey snap3db"
-dbs="snapdb"
-# snapdb wisckey rocksdb snap3db mixdb"
+dbs="pebblesdb"
+# snapdb wisckey rocksdb snap3db mixdb pebblesdb
 
 if [ ! -d "$results_dir" ]; then
 	mkdir -p $results_dir
