@@ -3,7 +3,7 @@
 trap "exit" INT
 
 # record_counts="1M 10M 50M 100M"
-record_counts="1M"
+record_counts="50M"
 # load_sizes="64 256 1k 4k"
 load_sizes="64"
 # 512 1k"
@@ -14,10 +14,10 @@ scan_lengths=""
 aging_rounds=0
 do_compaction=0
 do_gets=1
-do_get_update=1
+do_get_update=0
 aging_last=0
 
-results_dir="results/throughput_no_start_stop_1M"
+results_dir="results/snaptree_filter_fixed_large"
 # dbs="snap3db"
 # dbs="mixdb rocksdb wisckey snap3db"
 dbs="snapdb"

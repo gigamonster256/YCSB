@@ -23,10 +23,10 @@ function execute {
     local workload_file=$3
     local additional_args=$4
 
-    ./bin/ycsb $type $db -s -P $workload_file $additional_args  2>/dev/null \
-        | grep -E "RunTime|Throughput|AverageLatency|50thPercentileLatency|95thPercentileLatency|99thPercentileLatency|99.99PercentileLatency" \
-        | grep -Ev "CLEANUP" \
-        | awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16}'
+    ./bin/ycsb $type $db -s -P $workload_file $additional_args #  2>/dev/null \
+        # | grep -E "RunTime|Throughput|AverageLatency|50thPercentileLatency|95thPercentileLatency|99thPercentileLatency|99.99PercentileLatency" \
+        # | grep -Ev "CLEANUP" \
+        # | awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16}'
 }
 
 function validate_record_count {
