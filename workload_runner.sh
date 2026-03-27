@@ -3,24 +3,24 @@
 trap "exit" INT
 
 # record_counts="1M 10M 50M 100M"
-record_counts="1M"
+record_counts="100M"
 # load_sizes="64 256 1k 4k"
-load_sizes="64"
+load_sizes="256"
 # 512 1k"
 # 512 1k 4k"
 # scan_lengths="100"
 # scan_lengths="50 100 500"
 scan_lengths=""
-aging_rounds=0
+aging_rounds=3
 do_compaction=0
 do_gets=1
-do_get_update=0
-aging_last=0
+do_get_update=1
+aging_last=1
 
-results_dir="results/initial_pebblesdb"
+results_dir="results/$(date +%Y-%m-%d-%H-%M-%S)_full_suite"
 # dbs="snap3db"
 # dbs="mixdb rocksdb wisckey snap3db"
-dbs="pebblesdb"
+dbs="snapdb wisckey rocksdb pebblesdb"
 # snapdb wisckey rocksdb snap3db mixdb pebblesdb
 
 if [ ! -d "$results_dir" ]; then
